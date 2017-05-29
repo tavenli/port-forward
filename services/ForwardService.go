@@ -27,11 +27,11 @@ func init() {
 
 }
 
-func (_self *ForwardService) PortConflict(sourcePort string) bool {
+func (_self *ForwardService) PortConflict(key string) bool {
 	portMapLock.Lock()
 	defer portMapLock.Unlock()
 
-	if _, ok := portMap[sourcePort]; ok {
+	if _, ok := portMap[key]; ok {
 		return true
 	} else {
 		return false
@@ -39,20 +39,20 @@ func (_self *ForwardService) PortConflict(sourcePort string) bool {
 
 }
 
-func (_self *ForwardService) RegistryPort(sourcePort string, listener net.Listener) {
+func (_self *ForwardService) RegistryPort(key string, listener net.Listener) {
 	portMapLock.Lock()
 	defer portMapLock.Unlock()
 
-	portMap[sourcePort] = listener
+	portMap[key] = listener
 
 }
 
-func (_self *ForwardService) UnRegistryPort(sourcePort string) {
+func (_self *ForwardService) UnRegistryPort(key string) {
 	portMapLock.Lock()
 	defer portMapLock.Unlock()
 
-	delete(portMap, sourcePort)
-	logs.Debug("UnRegistryPort sourcePort: ", sourcePort)
+	delete(portMap, key)
+	logs.Debug("UnRegistryPort key: ", key)
 
 }
 
@@ -73,16 +73,33 @@ func (_self *ForwardService) UnRegistryClient(sourcePort string) {
 
 }
 
+func (_self *ForwardService) GetKeyByEntity(entity *models.PortForward) string {
+
+	fromAddr := fmt.Sprint(entity.Addr, ":", entity.Port)
+	toAddr := fmt.Sprint(entity.TargetAddr, ":", entity.TargetPort)
+	key := _self.GetKey(fromAddr, toAddr)
+
+	return key
+}
+
+func (_self *ForwardService) GetKey(sourcePort, targetPort string) string {
+
+	return fmt.Sprint(sourcePort, "_TCP_", targetPort)
+
+}
+
 //
 // sourcePort 源地址和端口，例如：0.0.0.0:8700，本程序会新建立监听
 // targetPort 数据转发给哪个端口，例如：192.168.1.100:3306
-func (_self *ForwardService) StartTcpPortForward(sourcePort string, targetPort string, result chan models.ResultData) {
+func (_self *ForwardService) StartPortForward(sourcePort string, targetPort string, result chan models.ResultData) {
 	resultData := &models.ResultData{Code: 0, Msg: ""}
 	logs.Debug("StartTcpPortForward sourcePort: ", sourcePort, " targetPort:", targetPort)
 
-	if _self.PortConflict(sourcePort) {
+	key := _self.GetKey(sourcePort, targetPort)
+
+	if _self.PortConflict(key) {
 		resultData.Code = 1
-		resultData.Msg = fmt.Sprint("监听地址冲突 ", sourcePort)
+		resultData.Msg = fmt.Sprint("监听地址已被占用 ", sourcePort)
 		result <- *resultData
 		return
 	}
@@ -97,7 +114,7 @@ func (_self *ForwardService) StartTcpPortForward(sourcePort string, targetPort s
 		return
 	}
 
-	_self.RegistryPort(sourcePort, localListener)
+	_self.RegistryPort(key, localListener)
 
 	result <- *resultData
 
@@ -140,7 +157,7 @@ func (_self *ForwardService) StartTcpPortForward(sourcePort string, targetPort s
 
 }
 
-func (_self *ForwardService) CloseTcpPortForward(sourcePort string, result chan models.ResultData) {
+func (_self *ForwardService) ClosePortForward(sourcePort string, targetPort string, result chan models.ResultData) {
 	resultData := &models.ResultData{Code: 0, Msg: ""}
 
 	logs.Debug("CloseTcpPortForward:", sourcePort)
@@ -156,13 +173,14 @@ func (_self *ForwardService) CloseTcpPortForward(sourcePort string, result chan 
 	}
 
 	//关闭本地监听
-	if localListener, ok := portMap[sourcePort]; ok {
+	key := _self.GetKey(sourcePort, targetPort)
+	if localListener, ok := portMap[key]; ok {
 		localListener.Close()
-		logs.Debug("listener close:", sourcePort)
-		_self.UnRegistryPort(sourcePort)
+		logs.Debug("listener close:", key)
+		_self.UnRegistryPort(key)
 	} else {
 		resultData.Code = 1
-		resultData.Msg = fmt.Sprint("未启用监听 ", sourcePort)
+		resultData.Msg = fmt.Sprint("未启用监听 ", key)
 
 	}
 

@@ -25,15 +25,24 @@ func (c *RestApiCtrl) ServerSummary() {
 
 }
 
-// @router /OpenTcpForward [get,post]
-func (c *RestApiCtrl) OpenTcpForward() {
+// @router /OpenForward [get,post]
+func (c *RestApiCtrl) OpenForward() {
 	fromAddr := c.GetString("fromAddr")
 	toAddr := c.GetString("toAddr")
 
+	entity := services.SysDataS.ChkPortForwardByApi(fromAddr, "TCP", toAddr)
+	if entity == nil {
+		_, err := services.SysDataS.SavePortForwardByApi(fromAddr, "TCP", toAddr)
+		if err != nil {
+			c.Data["json"] = models.ResultData{Code: 1, Msg: "保存端口配置失败"}
+			c.ServeJSON()
+			return
+		}
+	}
 	//测试
-	//http://127.0.0.1:8000/api/v1/OpenTcpForward?auth=26CCD056107481F45D1AC805A24A9E59&fromAddr=:8010&toAddr=127.0.0.1:3306
+	//http://127.0.0.1:8000/api/v1/OpenForward?auth=26CCD056107481F45D1AC805A24A9E59&fromAddr=:8010&toAddr=127.0.0.1:3306
 	resultChan := make(chan models.ResultData)
-	go services.ForwardS.StartTcpPortForward(fromAddr, toAddr, resultChan)
+	go services.ForwardS.StartPortForward(fromAddr, toAddr, resultChan)
 
 	c.Data["json"] = <-resultChan
 
@@ -41,14 +50,15 @@ func (c *RestApiCtrl) OpenTcpForward() {
 
 }
 
-// @router /CloseTcpForward [get,post]
-func (c *RestApiCtrl) CloseTcpForward() {
+// @router /CloseForward [get,post]
+func (c *RestApiCtrl) CloseForward() {
 	fromAddr := c.GetString("fromAddr")
+	toAddr := c.GetString("toAddr")
 
 	//测试
-	//http://127.0.0.1:8000/api/v1/CloseTcpForward?auth=26CCD056107481F45D1AC805A24A9E59&fromAddr=:8010
+	//http://127.0.0.1:8000/api/v1/CloseForward?auth=26CCD056107481F45D1AC805A24A9E59&fromAddr=:8010&toAddr=127.0.0.1:3306
 	resultChan := make(chan models.ResultData)
-	go services.ForwardS.CloseTcpPortForward(fromAddr, resultChan)
+	go services.ForwardS.ClosePortForward(fromAddr, toAddr, resultChan)
 
 	c.Data["json"] = <-resultChan
 

@@ -8,12 +8,11 @@ import (
 
 func init() {
 
-	beego.Router("/", &controllers.DefaultCtrl{})
 	//
-	//
+	beego.Include(&controllers.DefaultCtrl{})
 	beego.Include(&controllers.LoginCtrl{})
 	beego.Include(&controllers.UCenterCtrl{})
-	beego.Include(&controllers.TcpForwardCtrl{})
+	beego.Include(&controllers.ForwardCtrl{})
 
 	api_ns := beego.NewNamespace("/api",
 		beego.NSNamespace("/v1",

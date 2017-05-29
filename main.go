@@ -29,9 +29,12 @@ func main() {
 	//beego.BConfig.WebConfig.Session.SessionProviderConfig = "./session"
 	gob.Register(&models.LoginUser{})
 
-	logs.Debug("★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★")
-	logs.Debug("                   tcp-forward 启动")
-	logs.Debug("★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★")
+	logs.Debug("★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★")
+	logs.Debug("               tcp-forward 启动")
+	logs.Debug("")
+	logs.Debug("开源项目地址：https://github.com/tavenli/port-forward")
+	logs.Debug("")
+	logs.Debug("★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★")
 
 	//默认static目录是可以直接访问的，其它目录需要单独指定
 	beego.SetStaticPath("/theme", "theme")
