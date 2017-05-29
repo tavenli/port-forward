@@ -76,6 +76,13 @@ func init() {
 			AllowHTTPMethods: []string{"get","post"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["port-forward/controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["port-forward/controllers:ForwardCtrl"],
+		beego.ControllerComments{
+			Method: "ApiDoc",
+			Router: `/u/ApiDoc`,
+			AllowHTTPMethods: []string{"get"},
+			Params: nil})
+
 	beego.GlobalControllerRouter["port-forward/controllers:HelpCtrl"] = append(beego.GlobalControllerRouter["port-forward/controllers:HelpCtrl"],
 		beego.ControllerComments{
 			Method: "GetTcp",

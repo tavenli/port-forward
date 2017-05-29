@@ -121,6 +121,39 @@ func (c *ForwardCtrl) SaveForward() {
 		return
 	}
 
+	if port < 0 || port > 65535 {
+		//
+		c.Data["json"] = models.ResultData{Code: 1, Msg: "监听端口 不在允许的范围"}
+		c.ServeJSON()
+		return
+	}
+
+	if utils.IsEmpty(targetAddr) {
+		//
+		c.Data["json"] = models.ResultData{Code: 1, Msg: "目标地址 不能为空"}
+		c.ServeJSON()
+		return
+	}
+
+	if targetPort < 0 || targetPort > 65535 {
+		//
+		c.Data["json"] = models.ResultData{Code: 1, Msg: "目标端口 不在允许的范围"}
+		c.ServeJSON()
+		return
+	}
+
+	if id > 0 {
+		entity := services.SysDataS.GetPortForwardById(id)
+		key := services.ForwardS.GetKeyByEntity(entity)
+		if services.ForwardS.PortConflict(key) {
+			//正在转发中，修改前先关闭
+			fromAddr := fmt.Sprint(entity.Addr, ":", entity.Port)
+			toAddr := fmt.Sprint(entity.TargetAddr, ":", entity.TargetPort)
+			resultChan := make(chan models.ResultData)
+			go services.ForwardS.ClosePortForward(fromAddr, toAddr, resultChan)
+		}
+	}
+
 	name = utils.FilterHtml(name)
 
 	entity := &models.PortForward{}
@@ -175,4 +208,11 @@ func (c *ForwardCtrl) CloseForward() {
 	c.Data["json"] = <-resultChan
 
 	c.ServeJSON()
+}
+
+// @router /u/ApiDoc [get]
+func (c *ForwardCtrl) ApiDoc() {
+
+	c.TplName = "ucenter/apiDoc.html"
+
 }
