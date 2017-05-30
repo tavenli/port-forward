@@ -1,6 +1,7 @@
 
 <div style="margin: auto;width: 900px;height: 500px;">
 
+<blockquote class="layui-elem-quote">当前API的AUTH鉴权密钥为：{{config "String" "api.auth" "请在data.conf中配置api.auth属性"}}</blockquote>
 
 <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
   <legend>开启端口转发 接口</legend>
@@ -22,7 +23,7 @@
   <div class="layui-form-item">
     <label class="layui-form-label">请求示例</label>
     <div class="layui-input-block">
-      <input type="text" value="/api/v1/OpenForward?auth=xxxxxxxxxx&fromAddr=:8010&toAddr=192.168.1.100:3306" disabled="disabled" class="layui-input">
+      <input type="text" value="/api/v1/OpenForward?auth={{config "String" "api.auth" "xxxx"}}&fromAddr=:8010&toAddr=192.168.1.100:3306" disabled="disabled" class="layui-input">
     </div>
   </div>
   <div class="layui-form-item">
@@ -86,7 +87,7 @@ Msg: 成功或失败的消息内容
   <div class="layui-form-item">
     <label class="layui-form-label">请求示例</label>
     <div class="layui-input-block">
-      <input type="text" value="/api/v1/CloseForward?auth=xxxxxxxxxx&fromAddr=:8010&toAddr=192.168.1.100:3306" disabled="disabled" class="layui-input">
+      <input type="text" value="/api/v1/CloseForward?auth={{config "String" "api.auth" "xxxx"}}&fromAddr=:8010&toAddr=192.168.1.100:3306" disabled="disabled" class="layui-input">
     </div>
   </div>
   <div class="layui-form-item">

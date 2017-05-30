@@ -49,6 +49,21 @@ func (_self *SysDataService) GetSysUserByName(userName string) *models.SysUser {
 
 }
 
+func (_self *SysDataService) ChangeUserPwd(id int, password string) error {
+	pwd := utils.GetMd5(password)
+	res, err := OrmerS.Raw("update t_sys_user SET passWord = ? where id = ?",
+		pwd, id).Exec()
+	if err == nil {
+		num, _ := res.RowsAffected()
+		logs.Debug("ChangeUserPwd", num)
+
+	} else {
+		logs.Error("ChangeUserPwd", err)
+
+	}
+	return err
+}
+
 func (_self *SysDataService) UpdateSysUser(entity *models.SysUser) error {
 
 	_, err := OrmerS.Update(entity)

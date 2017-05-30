@@ -153,4 +153,18 @@ func init() {
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["port-forward/controllers:UCenterCtrl"] = append(beego.GlobalControllerRouter["port-forward/controllers:UCenterCtrl"],
+		beego.ControllerComments{
+			Method: "ChangePwd",
+			Router: `/u/changePwd`,
+			AllowHTTPMethods: []string{"get"},
+			Params: nil})
+
+	beego.GlobalControllerRouter["port-forward/controllers:UCenterCtrl"] = append(beego.GlobalControllerRouter["port-forward/controllers:UCenterCtrl"],
+		beego.ControllerComments{
+			Method: "DoChangePwd",
+			Router: `/u/doChangePwd`,
+			AllowHTTPMethods: []string{"post"},
+			Params: nil})
+
 }
