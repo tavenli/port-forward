@@ -7,19 +7,18 @@
         <div class="layui-tab-item layui-show">
             <button class="layui-btn layui-btn-small" onclick="addForward();"><i class="layui-icon"></i> 添加转发</button>
             <button class="layui-btn layui-btn-small" onclick="delForward();"><i class="layui-icon"></i> 批量删除</button>
-
             <div class="layui-form">
                 <table class="layui-table">
                     <colgroup>
                         <col width="20">
                         <col width="50">
-                        <col>
+                        <col width="300">
                         <col width="150">
+                        <col width="120">
+                        <col width="50">
                         <col width="150">
-                        <col width="150">
-                        <col width="150">
-                        <col width="200">
-                        <col width="200">
+                        <col width="100">
+                        <col width="70">
                         <col width="200">
                     </colgroup>
                     <thead>
@@ -37,25 +36,19 @@
                         </tr>
                     </thead>
                     <tbody id="gridBody">
-
-
                     </tbody>
                 </table>
             </div>
-
             <div id="pagination"></div>
-
         </div>
         <div class="layui-tab-item">
             <pre class="layui-code">
 说明文档请访问：<a href="https://github.com/tavenli/port-forward" target="_blank">https://github.com/tavenli/port-forward</a>
-
 欢迎大家就使用问题或个性化需求在QQ群中讨论，QQ群号：99134862
             </pre>
         </div>
     </div>
 </div>
-
 <script id="grid_tpl" type="text/html">
     {Start{#  if(d.Data === null || d.Data.length === 0){ }End}
         <tr>
@@ -64,34 +57,25 @@
             </td>
         </tr>
     {Start{# } else { }End}
-
-    {Start{# for(var i=0, len = d.Data.length; i < len;i++){  }End}
-
-        <tr>
-            <td><input type="checkbox" name="id" lay-skin="primary" value="{Start{ d.Data[i].Id }End}"></td>
-            <td>{Start{ d.Data[i].Id }End}</td>
-            <td>{Start{ d.Data[i].Name }End}</td>
-            <td>{Start{ fmtAddr(d.Data[i].Addr,d.Data[i]) }End}</td>
-            <td>{Start{ d.Data[i].Port }End}</td>
-            <td>{Start{ d.Data[i].Protocol }End}</td>
-            <td>{Start{ d.Data[i].TargetAddr }End}</td>
-            <td>{Start{ d.Data[i].TargetPort }End}</td>
-            <td>{Start{ fmtStatus(d.Data[i].Status,d.Data[i]) }End}</td>
-            <td>
-               {Start{ oprFormatLink(d.Data[i].Status,d.Data[i]) }End}
-                
-            </td>
+        {Start{#  layui.each(d.Data, function(index, item){ }End}
+       <tr>
+                <td><input type="checkbox" name="id" lay-skin="primary" value="{Start{ item.Id }End}"></td>
+                <td>{Start{ item.Id }End}</td>
+                <td>{Start{ item.Name }End}</td>
+                <td>{Start{ fmtAddr(item.Addr,item) }End}</td>
+                <td>{Start{ item.Port }End}</td>
+                <td>{Start{ item.Protocol }End}</td>
+                <td>{Start{ item.TargetAddr }End}</td>
+                <td>{Start{ item.TargetPort }End}</td>
+                <td>{Start{ fmtStatus(item.Status,item) }End}</td>
+                <td>{Start{ oprFormatLink(item.Status,item) }End}</td>
         </tr>
-    {Start{# } }End}
-
+        {Start{#  }); }End}
     {Start{#  } }End}
-
 </script>
 
 <script type="text/javascript">
-
     $(document).ready(function () {
-
         layui.use(["jquery", "layer", "form", "element", "laytpl", "laypage"], function () {
             var $ = layui.jquery, layer = layui.layer, form = layui.form(), laytpl = layui.laytpl, laypage = layui.laypage;
             //全选
@@ -102,22 +86,15 @@
                 });
                 form.render('checkbox');
             });
-
             layui.laytpl.config({ open: "{Start{", close: "}End}" });
             query(1);
-
-        });        
-        
-
+        });
     });
-
-
-
     function query(pIndex) {
         // var columnFiled = $("#columnFiled").val();
         // var keyWord = $("#keyWord").val();
         $.post("ForwardList/json", { pIndex: pIndex, pSize: 10}, function (json) {
-            if (json.Code == 0) {//成功                    
+            if (json.Code == 0) {//成功
                 renderGrid(json.Data);
                 var totalPages = json.Data.Pages;
                 var totalRows = json.Data.TotalRows;
@@ -136,17 +113,11 @@
                         }
                     }
                 });
-
                 layui.form().render('checkbox');
-
             } else {//失败
                 layui.layer.alert("失败：" + json.Msg, { icon: 2 });
             }
-
-
         }, 'json');
-
-
     }
 
     function renderGrid(data) {
@@ -155,28 +126,23 @@
             $("#gridBody").html(html);
         });
     }
-
     function oprFormatLink(val,row){
         var html = "";
-        if(row.Status == 1){            
+        if(row.Status == 1){
             html += "<button class='layui-btn layui-btn-small layui-btn-danger' onclick='CloseForward("+row.Id+");'><i class='layui-icon'></i></button>";
         }else{
             html += "<button class='layui-btn layui-btn-small layui-btn-normal' onclick='OpenForward("+row.Id+");'><i class='layui-icon'></i></button>";
-        }        
-        
+        }
         html += "<button class='layui-btn layui-btn-small' onclick='editForward("+row.Id+");'><i class='layui-icon'></i></button>";
         return html;
     }
-
     function fmtAddr(val,row){
         if(val==""){
             return "监听所有地址";
         }else{
             return val;
         }
-
     }
-
     function fmtStatus(val,row){
         var html = "";
         switch(val){
@@ -185,11 +151,11 @@
                 break;
             case 1:
                 html = "<font color='green'>转发中</font>";
-                break;				
+                break;
             default:
                 html = "<font color='gray'>其它:"+val+"</font>";
                 break;
-        }			
+        }
         return html;
     }
 
@@ -203,22 +169,19 @@
                 moveType : 1, //拖拽风格，0是默认，1是传统拖动
                 shift : -1, //0-6的动画形式，-1不开启
                 maxmin: false,
-                content : html,                
+                content : html,
                 btn: ['保存配置', '取消'],
                 yes: function(index, layero){
                     submitForm(index);
-                    
                 },
-                btn2: function(index){                    
+                btn2: function(index){
                     layer.close(index);
-                },                
+                },
                 cancel: function(index){
                     layer.close(index);
                 }
             });
         });
-
-
     }
 
     function editForward(id) {
@@ -231,22 +194,19 @@
                 moveType : 1, //拖拽风格，0是默认，1是传统拖动
                 shift : -1, //0-6的动画形式，-1不开启
                 maxmin: false,
-                content : html,                
+                content : html,
                 btn: ['保存配置', '取消'],
                 yes: function(index, layero){
                     submitForm(index);
-                    
                 },
-                btn2: function(index){                    
+                btn2: function(index){
                     layer.close(index);
-                },                
+                },
                 cancel: function(index){
                     layer.close(index);
                 }
             });
         });
-
-
     }
 
     function delForward(){
@@ -255,9 +215,7 @@
             layer.alert("没有勾选要批量操作的数据.", {icon: 3,title:"警告信息"});
             return;
         }
-
         var ids = selectedItems.join(',');
-
         layer.confirm("确定批量删除勾选的数据吗？", {
             btn : [ '确定', '取消' ]//按钮
         }, function(index, layero) {
@@ -271,7 +229,6 @@
                 }
             }, 'json');
         });
-
     }
 
     function refreshGrid(){
@@ -279,7 +236,6 @@
     }
 
     function OpenForward(id){
-
         layer.confirm("确定启动该转发吗？", {
             btn : [ '确定', '取消' ]//按钮
         }, function(index, layero) {
@@ -293,11 +249,9 @@
                 }
             }, 'json');
         });
-
     }
 
     function CloseForward(id){
-
         layer.confirm("确定停止该转发吗？", {
             btn : [ '确定', '取消' ]//按钮
         }, function(index, layero) {
@@ -311,7 +265,6 @@
                 }
             }, 'json');
         });
-
     }
 
 </script>
