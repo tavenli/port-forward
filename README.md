@@ -1,6 +1,11 @@
 # port-forward
 Go语言开发的端口转发工具  for port data forward
 
+```
+开发语言：GO
+控制台框架：beego
+```
+
 # 功能介绍
 
 > 支持Web控制台添加端口映射
@@ -8,6 +13,12 @@ Go语言开发的端口转发工具  for port data forward
 > 支持对每条端口映射进行开启和关闭控制
 
 > 支持API接口，方便与其它系统集成
+
+# 已编译好的程序包
+
+[port-forward.win64.v1.0.zip](http://files.git.oschina.net/group1/M00/01/4E/PaAvDFktmFmADf8FAFiePV2ray4682.zip?token=95b2ff6047714107a757f930495c9530&ts=1496192518&attname=port-forward.win64.v1.0.zip)
+
+[port-forward.linux64.v1.0.zip](http://files.git.oschina.net/group1/M00/01/4E/PaAvDFktmK6Ac0A1AFDn6l67Jso205.zip?token=06b1de3e885eec779e2c9dbd965a5239&ts=1496192669&attname=port-forward.linux64.v1.0.zip)
 
 # 使用交流群
 
