@@ -17,9 +17,8 @@ Go语言开发的端口转发工具  for port data forward
 
 # 已编译好的程序包
 
-[port-forward.win64.v1.0.zip](http://files.git.oschina.net/group1/M00/01/4E/PaAvDFktmFmADf8FAFiePV2ray4682.zip?token=95b2ff6047714107a757f930495c9530&ts=1496192518&attname=port-forward.win64.v1.0.zip)
+[http://git.oschina.net/tavenli/port-forward/releases](http://git.oschina.net/tavenli/port-forward/releases)
 
-[port-forward.linux64.v1.0.zip](http://files.git.oschina.net/group1/M00/01/4E/PaAvDFktmK6Ac0A1AFDn6l67Jso205.zip?token=06b1de3e885eec779e2c9dbd965a5239&ts=1496192669&attname=port-forward.linux64.v1.0.zip)
 
 # 使用交流群
 
