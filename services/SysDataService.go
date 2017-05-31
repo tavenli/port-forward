@@ -215,7 +215,18 @@ func (_self *SysDataService) SavePortForward(entity *models.PortForward) error {
 		return err1
 	} else {
 		entity.CreateTime = time.Now()
-		_, err := OrmerS.Insert(entity)
+		//_, err := OrmerS.Insert(entity)
+		res, err := OrmerS.Raw("INSERT INTO t_port_forward(name, status, addr, port, protocol, targetAddr, targetPort, createTime) values(?,?,?,?,?,?,?,?)",
+			entity.Name, entity.Status, entity.Addr, entity.Port, entity.Protocol, entity.TargetAddr, entity.TargetPort, entity.CreateTime).Exec()
+		if err == nil {
+			num, _ := res.RowsAffected()
+			logs.Debug("AddPortForward", num)
+
+		} else {
+			logs.Error("AddPortForward", err)
+
+		}
+
 		return err
 	}
 
