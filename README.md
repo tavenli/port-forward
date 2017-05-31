@@ -4,6 +4,7 @@ Go语言开发的端口转发工具  for port data forward
 ```
 开发语言：GO
 控制台框架：beego
+数据库：sqlite3
 ```
 
 # 功能介绍
@@ -26,11 +27,9 @@ Go语言开发的端口转发工具  for port data forward
 
 # 快速安装说明
 1. 下载编译好的程序包，并解压程序包
-2. 在执行程序包目录下找 data/PortForwardDb.sql 的数据库创建文件，创建好数据库 PortForwardDb
-3. 修改 conf/data.conf 中的数据库连接串，主要是修改连接MySQL的用户名和密码
-4. 执行 start.sh （Linux）或 start.bat （Win）命令
-5. 打开浏览器，进入控制台，打开 http://127.0.0.1:8000/login
-6. 输入用户 admin  密码 123456 进入控制台
+2. 执行 start.sh （Linux）或 start.bat （Win）命令
+3. 打开浏览器，进入控制台，打开 http://127.0.0.1:8000/login
+4. 输入用户 admin  密码 123456 进入控制台
 
 
 # 控制台UI

@@ -222,6 +222,7 @@ func (_self *SysDataService) SavePortForward(entity *models.PortForward) error {
 }
 
 func (_self *SysDataService) DelPortForwards(ids []int) error {
+	//sqlite3在debug模式中，每次操作后会卡住，release环境中没有问题
 	//批量删除
 	del_num, err := OrmerS.QueryTable(new(models.PortForward)).Filter("Id__in", ids).Delete()
 	if err != nil {
