@@ -113,6 +113,7 @@ func (c *ForwardCtrl) SaveForward() {
 	//protocol := c.GetString("protocol", "TCP")
 	targetAddr := c.GetString("targetAddr", "")
 	targetPort, _ := c.GetInt("targetPort")
+	others := c.GetString("others", "")
 
 	if utils.IsEmpty(name) {
 		//
@@ -142,6 +143,11 @@ func (c *ForwardCtrl) SaveForward() {
 		return
 	}
 
+	// if utils.IsNotEmpty(others) {
+	// 	//如果有others信息，则检查
+
+	// }
+
 	if id > 0 {
 		entity := services.SysDataS.GetPortForwardById(id)
 		key := services.ForwardS.GetKeyByEntity(entity)
@@ -164,6 +170,7 @@ func (c *ForwardCtrl) SaveForward() {
 	entity.Protocol = "TCP"
 	entity.TargetAddr = targetAddr
 	entity.TargetPort = targetPort
+	entity.Others = others
 
 	err := services.SysDataS.SavePortForward(entity)
 	if err == nil {
@@ -181,11 +188,8 @@ func (c *ForwardCtrl) OpenForward() {
 	id, _ := c.GetInt("id")
 	entity := services.SysDataS.GetPortForwardById(id)
 
-	fromAddr := fmt.Sprint(entity.Addr, ":", entity.Port)
-	toAddr := fmt.Sprint(entity.TargetAddr, ":", entity.TargetPort)
-
 	resultChan := make(chan models.ResultData)
-	go services.ForwardS.StartPortForward(fromAddr, toAddr, resultChan)
+	go services.ForwardS.StartPortForward(entity, resultChan)
 
 	c.Data["json"] = <-resultChan
 

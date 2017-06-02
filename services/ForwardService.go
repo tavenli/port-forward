@@ -4,6 +4,7 @@ import (
 	"io"
 	"net"
 	"port-forward/models"
+	"port-forward/utils"
 	"strings"
 	"sync"
 	"time"
@@ -91,7 +92,11 @@ func (_self *ForwardService) GetKey(sourcePort, targetPort string) string {
 //
 // sourcePort 源地址和端口，例如：0.0.0.0:8700，本程序会新建立监听
 // targetPort 数据转发给哪个端口，例如：192.168.1.100:3306
-func (_self *ForwardService) StartPortForward(sourcePort string, targetPort string, result chan models.ResultData) {
+func (_self *ForwardService) StartPortForward(portForward *models.PortForward, result chan models.ResultData) {
+
+	sourcePort := fmt.Sprint(portForward.Addr, ":", portForward.Port)
+	targetPort := fmt.Sprint(portForward.TargetAddr, ":", portForward.TargetPort)
+
 	resultData := &models.ResultData{Code: 0, Msg: ""}
 	logs.Debug("StartTcpPortForward sourcePort: ", sourcePort, " targetPort:", targetPort)
 
@@ -135,18 +140,43 @@ func (_self *ForwardService) StartPortForward(sourcePort string, targetPort stri
 		//targetPort := "172.16.128.83:22"
 		targetConn, err := net.DialTimeout("tcp", targetPort, 30*time.Second)
 
-		go func() {
-			_, err = _self.Copy(targetConn, sourceConn)
-			if err != nil {
-				logs.Error("1网络连接异常：", err)
-				_self.UnRegistryClient(fmt.Sprint(sourcePort, "_", sourceConn.RemoteAddr().String()))
+		if utils.IsNotEmpty(portForward.Others) {
+			var dispatchConns []io.Writer
+			dispatchConns = append(dispatchConns, targetConn)
+			//分发方式
+			dispatchTargets := utils.Split(portForward.Others, ";")
+
+			for _, dispatchTarget := range dispatchTargets {
+				logs.Debug("分发到：", dispatchTarget)
+				dispatchTargetConn, err := net.DialTimeout("tcp", dispatchTarget, 30*time.Second)
+				if err == nil {
+					dispatchConns = append(dispatchConns, dispatchTargetConn)
+				}
+
 			}
-		}()
+
+			go func() {
+				mWriter := io.MultiWriter(dispatchConns...)
+				_, err = _self.Copy(mWriter, sourceConn)
+				if err != nil {
+					logs.Error("Dispatch网络连接异常：", err)
+				}
+			}()
+
+		} else {
+			go func() {
+				_, err = _self.Copy(targetConn, sourceConn)
+				if err != nil {
+					logs.Error("客户端来源数据转发到目标端口异常：", err)
+					_self.UnRegistryClient(fmt.Sprint(sourcePort, "_", sourceConn.RemoteAddr().String()))
+				}
+			}()
+		}
 
 		go func() {
 			_, err = _self.Copy(sourceConn, targetConn)
 			if err != nil {
-				logs.Error("2网络连接异常：", err)
+				logs.Error("目标端口返回响应数据异常：", err)
 				_self.UnRegistryPort(sourcePort)
 			}
 		}()
@@ -154,6 +184,20 @@ func (_self *ForwardService) StartPortForward(sourcePort string, targetPort stri
 	}
 
 	logs.Debug("TcpPortForward sourcePort: ", sourcePort, " Close.")
+
+}
+
+func (_self *ForwardService) DataDispatch(src io.Reader, targetPorts []string) {
+	for _, target := range targetPorts {
+		logs.Debug("分发到：", target)
+		go func() {
+			targetConn, err := net.DialTimeout("tcp", target, 30*time.Second)
+			_, err = _self.Copy(targetConn, src)
+			if err != nil {
+				logs.Error("Dispatch网络连接异常：", err)
+			}
+		}()
+	}
 
 }
 

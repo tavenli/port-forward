@@ -42,7 +42,20 @@
         <input type="text" name="targetPort" value="{{if gt .entity.TargetPort 0}}{{.entity.TargetPort}}{{end}}" lay-verify="required|number" placeholder="目标端口号，例如3306" autocomplete="off" class="layui-input">
       </div>
     </div>
-
+    <div class="layui-form-item">
+      <label class="layui-form-label">多分发</label>
+      <div class="layui-input-block">
+        <input type="text" name="others" value="{{.entity.Others}}" placeholder="如 192.1.1.100:8081;192.1.1.100:8082" title="多个用 ; 号隔开" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+        <pre class="layui-code" style="text-align: left;">
+*多分发说明：
+如果不需要“多分发”，请留空；
+如果需要分发到多个端口，填写格式为 “IP:端口”，多个用 ; 号隔开
+如 192.1.1.100:8081;192.1.1.100:8082
+        </pre> 
+    </div>
   </form>
 
 </div>

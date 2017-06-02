@@ -20,6 +20,8 @@ type PortForward struct {
 	// 端口号
 	TargetPort int       `orm:"column(targetPort);null"`
 	CreateTime time.Time `orm:"column(createTime);type(datetime)"`
+	//暂时用来存放端口分发配置，后续版本再调整
+	Others string `orm:"column(others);size(500);null"`
 }
 
 func (t *PortForward) TableName() string {

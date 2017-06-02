@@ -42,7 +42,7 @@ func (c *RestApiCtrl) OpenForward() {
 	//测试
 	//http://127.0.0.1:8000/api/v1/OpenForward?auth=26CCD056107481F45D1AC805A24A9E59&fromAddr=:8010&toAddr=127.0.0.1:3306
 	resultChan := make(chan models.ResultData)
-	go services.ForwardS.StartPortForward(fromAddr, toAddr, resultChan)
+	go services.ForwardS.StartPortForward(entity, resultChan)
 
 	c.Data["json"] = <-resultChan
 
