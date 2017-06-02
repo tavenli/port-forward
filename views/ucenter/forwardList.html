@@ -57,30 +57,28 @@
 </div>
 
 <script id="grid_tpl" type="text/html">
-    {Start{# if(d.Data === null || d.Data.length === 0){ }End}
-    <tr>
-        <td colspan="10">
-            请先添加一条端口转发配置规则
-        </td>
-    </tr>
-    {Start{# } else { }End} {Start{# for(var i=0, len = d.Data.length; i
-    < len;i++){ }End} <tr>
-        <td><input type="checkbox" name="id" lay-skin="primary" value="{Start{ d.Data[i].Id }End}"></td>
-        <td>{Start{ d.Data[i].Id }End}</td>
-        <td>{Start{ d.Data[i].Name }End}</td>
-        <td>{Start{ fmtAddr(d.Data[i].Addr,d.Data[i]) }End}</td>
-        <td>{Start{ d.Data[i].Port }End}</td>
-        <td>{Start{ d.Data[i].Protocol }End}</td>
-        <td>{Start{ d.Data[i].TargetAddr }End}</td>
-        <td>{Start{ d.Data[i].TargetPort }End}</td>
-        <td>{Start{ fmtStatus(d.Data[i].Status,d.Data[i]) }End}</td>
-        <td>
-            {Start{ oprFormatLink(d.Data[i].Status,d.Data[i]) }End}
-
-        </td>
+    {Start{# if(d.Data === null || d.Data.length === 0){  }End}
+        <tr>
+           <td colspan="10">
+               请先添加一条端口转发配置规则
+           </td>
         </tr>
-        {Start{# } }End} {Start{# } }End}
-
+    {Start{# } else {  }End}
+        {Start{#  layui.each(d.Data, function(index, item){  }End}
+        <tr>
+            <td><input type="checkbox" name="id" lay-skin="primary" value="{Start{ item.Id }End}"></td>
+            <td>{Start{ item.Id }End}</td>
+            <td>{Start{ item.Name }End}</td>
+            <td>{Start{# fmtAddr(item.Addr,item) }End}</td>
+            <td>{Start{ item.Port }End}</td>
+            <td>{Start{ item.Protocol }End}</td>
+            <td>{Start{ item.TargetAddr }End}</td>
+            <td>{Start{ item.TargetPort }End}</td>
+            <td>{Start{# fmtStatus(item.Status,item) }End}</td>
+            <td>{Start{ oprFormatLink(item.Status,item) }End}</td>
+        </tr>
+        {Start{#  });  }End}
+    {Start{#  } }End}
 </script>
 
 <script type="text/javascript">
@@ -103,7 +101,7 @@
         // var columnFiled = $("#columnFiled").val();
         // var keyWord = $("#keyWord").val();
         $.post("ForwardList/json", { pIndex: pIndex, pSize: 10 }, function (json) {
-            if (json.Code == 0) {//成功                    
+            if (json.Code == 0) {//成功
                 renderGrid(json.Data);
                 var totalPages = json.Data.Pages;
                 var totalRows = json.Data.TotalRows;
