@@ -1,0 +1,32 @@
+{
+    "go.formatTool": "goimports",
+    "go.alternateTools": {
+    
+    },
+    "[go]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true,
+        },
+        // Optional: Disable snippets, as they conflict with completion ranking.
+        "editor.snippetSuggestions": "none",
+    },
+    "[go.mod]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true,
+        },
+    },
+    "go.gotoSymbol.includeImports": true,
+    "go.gotoSymbol.includeGoroot": true,
+    "go.languageServerExperimentalFeatures": {
+
+        "diagnostics": true,
+        "documentLink": true
+    },
+    "go.trace.server": "verbose",
+    "go.overwriteGoplsMiddleware": {
+    
+    },
+    "go.useLanguageServer": true
+}

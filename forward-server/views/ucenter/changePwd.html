@@ -1,0 +1,64 @@
+<div style="margin: auto;width: 900px;height: 500px;">
+
+  <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+    <legend>修改当前用户的登录密码</legend>
+  </fieldset>
+
+  <form id="form1" class="layui-form layui-form-pane" action="/u/doChangePwd" method="POST">
+    <div class="layui-form-item">
+      <label class="layui-form-label">新密码</label>
+      <div class="layui-input-block">
+        <input type="password" name="passWord" lay-verify="required" placeholder="请输入新的密码" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">确认密码</label>
+      <div class="layui-input-block">
+        <input type="password" name="passWord2" lay-verify="required" placeholder="请再次输入新的密码" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit="" lay-filter="pwd">修改密码</button>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+
+    layui.use(["form", "element"], function () {
+      var form = layui.form;
+
+      form.on('submit(pwd)', function(data){
+        
+        submitForm();
+        loadFrameContent('/u/changePwd');
+        return false;
+      });
+
+    });
+
+  });
+
+  function submitForm() {
+
+    var postData = $("#form1").serializeArray();
+    $.post($("#form1").attr("action"), postData, function (json) {
+      //var data = $.parseJSON(json);
+      if (json.Code == 0) {
+        //成功
+        layer.alert("修改成功");
+
+      } else {
+        //
+        layer.alert("失败了：" + json.Msg, { icon: 2 });
+      }
+    }, "json");
+  }
+
+</script>

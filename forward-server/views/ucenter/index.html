@@ -1,0 +1,52 @@
+
+<div style="margin: auto;width: 800px;height: 500px;">
+
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+  <legend>系统信息</legend>
+</fieldset>  
+<form class="layui-form  layui-form-pane" action="" method="POST">
+  <div class="layui-form-item">
+    <label class="layui-form-label">CPU核心数</label>
+    <div class="layui-input-inline">
+      <input type="text" value="{{.runtime_NumCPU}}" disabled="disabled" class="layui-input">
+    </div>
+    
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">CPU架构</label>
+    <div class="layui-input-block">
+      <input type="text" value="{{.runtime_GOARCH}}" disabled="disabled" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">系统类型</label>
+    <div class="layui-input-block">
+      <input type="text" value="{{.runtime_GOOS}}" disabled="disabled" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">服务器时间</label>
+    <div class="layui-input-block">
+      <input type="text" value="{{.server_Time}}" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+
+</form>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        layui.use(['jquery','layer', 'form', 'element'], function () {
+            var $ = layui.jquery, form = layui.form;
+
+
+        });
+
+    });
+
+</script>
+

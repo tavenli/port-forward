@@ -1,0 +1,271 @@
+<div class="layui-tab layui-tab-card">
+    <ul class="layui-tab-title">
+        <li class="layui-this">端口转发列表</li>
+        <li>帮助说明</li>
+    </ul>
+    <div class="layui-tab-content" style="height: auto;">
+        <div class="layui-tab-item layui-show">
+            <button class="layui-btn layui-btn-small" onclick="addForward();"><i class="layui-icon"></i> 添加转发</button>
+            <button class="layui-btn layui-btn-small" onclick="delForward();"><i class="layui-icon"></i> 批量删除</button>
+
+            <div class="layui-form">
+                <table class="layui-table">
+                    <colgroup>
+                        <col width="20">
+                        <col width="50">
+                        <col width="300">
+                        <col width="150">
+                        <col width="120">
+                        <col width="50">
+                        <col width="150">
+                        <col width="100">
+                        <col width="70">
+                        <col width="200">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" name="" lay-skin="primary" lay-filter="allChoose"></th>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>本地监听地址</th>
+                            <th>本地监听端口</th>
+                            <th>协议</th>
+                            <th>转发到地址</th>
+                            <th>转发到端口</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gridBody">
+
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="pagination"></div>
+
+        </div>
+        <div class="layui-tab-item">
+            <pre class="layui-code">
+说明文档请访问：<a href="https://github.com/tavenli/port-forward" target="_blank">https://github.com/tavenli/port-forward</a>
+
+欢迎大家就使用问题或个性化需求在QQ群中讨论，QQ群号：99134862
+            </pre>
+        </div>
+    </div>
+</div>
+
+<script id="grid_tpl" type="text/html">
+    {Start{# if(d.Data === null || d.Data.length === 0){ }End}
+    <tr>
+        <td colspan="10">
+            请先添加一条端口转发配置规则
+        </td>
+    </tr>
+    {Start{# } else { }End} {Start{# for(var i=0, len = d.Data.length; i<len;i++){ }End} <tr>
+        <td><input type="checkbox" name="id" lay-skin="primary" value="{Start{ d.Data[i].Id }End}"></td>
+        <td>{Start{ d.Data[i].Id }End}</td>
+        <td>{Start{ d.Data[i].Name }End}</td>
+        <td>{Start{ fmtAddr(d.Data[i].Addr,d.Data[i]) }End}</td>
+        <td>{Start{ d.Data[i].Port }End}</td>
+        <td>{Start{ d.Data[i].Protocol }End}</td>
+        <td>{Start{ d.Data[i].TargetAddr }End}</td>
+        <td>{Start{ d.Data[i].TargetPort }End}</td>
+        <td>{Start{ fmtStatus(d.Data[i].Status,d.Data[i]) }End}</td>
+        <td>
+            {Start{ oprFormatLink(d.Data[i].Status,d.Data[i]) }End}
+
+        </td>
+        </tr>
+        {Start{# } }End} {Start{# } }End}
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        layui.use(["jquery", "layer", "form", "element", "laytpl", "laypage"], function () {
+            var $ = layui.jquery, layer = layui.layer, form = layui.form, laytpl = layui.laytpl, laypage = layui.laypage;
+            //全选
+            form.on('checkbox(allChoose)', function (data) {
+                var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+                child.each(function (index, item) {
+                    item.checked = data.elem.checked;
+                });
+                form.render('checkbox');
+            });
+            layui.laytpl.config({ open: "{Start{", close: "}End}" });
+            query(1);
+        });
+    });
+    function query(pIndex) {
+        // var columnFiled = $("#columnFiled").val();
+        // var keyWord = $("#keyWord").val();
+        $.post("ForwardList/json", { pIndex: pIndex, pSize: 10 }, function (json) {
+            if (json.Code == 0) {//成功                    
+                renderGrid(json.Data);
+                var totalPages = json.Data.Pages;
+                var totalRows = json.Data.TotalRows;
+                //显示分页
+                layui.laypage({
+                    cont: 'pagination', //容器
+                    pages: totalPages, //通过后台拿到的总页数
+                    total: totalRows,
+                    groups: 5, //连续分页数
+                    skin: "#51b921", //控制分页皮肤。目前支持：molv、yahei、flow 除此之外，还支持16进制颜色值，如:skin:'#c00'
+                    curr: pIndex || 1, //当前页
+                    skip: true,
+                    jump: function (obj, first) { //触发分页后的回调
+                        if (!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+                            query(obj.curr);
+                        }
+                    }
+                });
+                layui.form.render('checkbox');
+            } else {//失败
+                layui.layer.alert("失败：" + json.Msg, { icon: 2 });
+            }
+        }, 'json');
+    }
+    function renderGrid(data) {
+        var grid_tpl = document.getElementById('grid_tpl').innerHTML;
+        layui.laytpl(grid_tpl).render(data, function (html) {
+            $("#gridBody").html(html);
+        });
+    }
+    function oprFormatLink(val, row) {
+        var html = "";
+        if (row.Status == 1) {
+            html += "<button class='layui-btn layui-btn-small layui-btn-danger' onclick='CloseForward(" + row.Id + ");'><i class='layui-icon'></i></button>";
+        } else {
+            html += "<button class='layui-btn layui-btn-small layui-btn-normal' onclick='OpenForward(" + row.Id + ");'><i class='layui-icon'></i></button>";
+        }
+        html += "<button class='layui-btn layui-btn-small' onclick='editForward(" + row.Id + ");'><i class='layui-icon'></i></button>";
+        return html;
+    }
+    function fmtAddr(val, row) {
+        if (val == "") {
+            return "监听所有地址";
+        } else {
+            return val;
+        }
+    }
+    function fmtStatus(val, row) {
+        var html = "";
+        switch (val) {
+            case 0:
+                html = "<font color='red'>停止</font>";
+                break;
+            case 1:
+                html = "<font color='green'>转发中</font>";
+                break;
+            default:
+                html = "<font color='gray'>其它:" + val + "</font>";
+                break;
+        }
+        return html;
+    }
+    function addForward() {
+        $.get('/u/AddForward', { rnd: Math.random() }, function (html) {
+            layer.open({
+                type: 1, //page层
+                area: ['400px', '450px'],
+                title: '添加网络转发端口',
+                shade: 0.6, //遮罩透明度
+                moveType: 1, //拖拽风格，0是默认，1是传统拖动
+                shift: -1, //0-6的动画形式，-1不开启
+                maxmin: false,
+                content: html,
+                btn: ['保存配置', '取消'],
+                yes: function (index, layero) {
+                    submitForm(index);
+                },
+                btn2: function (index) {
+                    layer.close(index);
+                },
+                cancel: function (index) {
+                    layer.close(index);
+                }
+            });
+        });
+    }
+    function editForward(id) {
+        $.get('/u/EditForward', { rnd: Math.random(), id: id }, function (html) {
+            layer.open({
+                type: 1, //page层
+                area: ['600px', '550px'],
+                title: '编辑网络转发端口',
+                shade: 0.6, //遮罩透明度
+                moveType: 1, //拖拽风格，0是默认，1是传统拖动
+                shift: -1, //0-6的动画形式，-1不开启
+                maxmin: false,
+                content: html,
+                btn: ['保存配置', '取消'],
+                yes: function (index, layero) {
+                    submitForm(index);
+                },
+                btn2: function (index) {
+                    layer.close(index);
+                },
+                cancel: function (index) {
+                    layer.close(index);
+                }
+            });
+        });
+    }
+    function delForward() {
+        var selectedItems = getChkValues("id");
+        if (selectedItems.length == 0) {
+            layer.alert("没有勾选要批量操作的数据.", { icon: 3, title: "警告信息" });
+            return;
+        }
+        var ids = selectedItems.join(',');
+        layer.confirm("确定批量删除勾选的数据吗？", {
+            btn: ['确定', '取消']//按钮
+        }, function (index, layero) {
+            $.post("/u/DelForward", { rnd: Math.random(), ids: ids }, function (json) {
+                if (json.Code == 0) {//成功
+                    layer.msg("执行成功.");
+                    query(1);
+                } else {//失败
+                    layer.alert(json.Msg, { icon: 2 });
+                    query(1);
+                }
+            }, 'json');
+        });
+    }
+    function refreshGrid() {
+        query(1);
+    }
+    function OpenForward(id) {
+        layer.confirm("确定启动该转发吗？", {
+            btn: ['确定', '取消']//按钮
+        }, function (index, layero) {
+            $.post("/u/OpenForward", { rnd: Math.random(), id: id }, function (json) {
+                if (json.Code == 0) {//成功
+                    layer.msg("执行成功.");
+                    query(1);
+                } else {//失败
+                    layer.alert(json.Msg, { icon: 2 });
+                    query(1);
+                }
+            }, 'json');
+        });
+    }
+    function CloseForward(id) {
+        layer.confirm("确定停止该转发吗？", {
+            btn: ['确定', '取消']//按钮
+        }, function (index, layero) {
+            $.post("/u/CloseForward", { rnd: Math.random(), id: id }, function (json) {
+                if (json.Code == 0) {//成功
+                    layer.msg("执行成功.");
+                    query(1);
+                } else {//失败
+                    layer.alert(json.Msg, { icon: 2 });
+                    query(1);
+                }
+            }, 'json');
+        });
+    }
+
+</script>

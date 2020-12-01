@@ -8,6 +8,19 @@ Go语言开发的端口转发工具  for port data forward
 数据库：sqlite3
 ```
 
+# 最近更新
+```
+v1.3.3 发布，增加 一键开启所有转发 和 一键关闭所有转发
+v1.3.2 发布，服务稳定性已经过长时间的验证
+v1.3.1 发布，增加程序启动自动开启转发
+v1.2.9_beta 发布，完善点对点转发的稳定性，支持TCP和UDP协议转发
+```
+
+# 最新编译好的版本下载：
+[http://git.oschina.net/tavenli/port-forward/releases](http://git.oschina.net/tavenli/port-forward/releases)
+
+
+
 # 功能介绍
 
 > 支持Web控制台添加端口映射
@@ -18,10 +31,6 @@ Go语言开发的端口转发工具  for port data forward
 
 > 支持每条端口转发的同时，再分发给多个端口，满足某些测试场景
 
-# 已编译好的程序包
-
-[http://git.oschina.net/tavenli/port-forward/releases](http://git.oschina.net/tavenli/port-forward/releases)
-
 
 # 使用交流群
 
@@ -30,7 +39,7 @@ Go语言开发的端口转发工具  for port data forward
 # 快速安装说明
 1. 下载编译好的程序包，并解压程序包
 2. 执行 start.sh （Linux）或 start.bat （Win）命令
-3. 打开浏览器，进入控制台，打开 http://127.0.0.1:8000/login
+3. 打开浏览器，进入控制台，打开 http://127.0.0.1:8080/login
 4. 输入用户 admin  密码 123456 进入控制台
 
 

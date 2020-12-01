@@ -1,0 +1,170 @@
+
+<div style="margin: auto;width: 900px;height: 500px;">
+
+  <div class="layui-form-item">
+      <pre class="layui-code">
+本工具提供RestfulApi，方便与其它系统工具进行集成，可在其它系统中直接通过接口，实现端口转发的开启和关闭。
+      </pre>
+  </div>
+
+<blockquote class="layui-elem-quote">
+  当前API的AUTH鉴权密钥为：<span style="color: blue;">{{config "String" "api.auth" "请在data.conf中配置api.auth属性"}}</span>
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+  <legend>开启端口转发 接口</legend>
+</fieldset>  
+<form class="layui-form layui-form-pane" action="" method="POST">
+  <div class="layui-form-item">
+    <label class="layui-form-label">接口地址</label>
+    <div class="layui-input-inline">
+      <input type="text" value="/api/v1/OpenForward" disabled="disabled" class="layui-input">
+    </div>
+    
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">请求方式</label>
+    <div class="layui-input-block">
+      <input type="text" value="GET 或 POST" disabled="disabled" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">请求示例</label>
+    <div class="layui-input-block">
+      <input type="text" value="/api/v1/OpenForward?auth={{config "String" "api.auth" "xxxx"}}&fromAddr=:8010&toAddr=192.168.1.100:3306&protocol=TCP" disabled="disabled" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">参数说明：</label>
+    
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">auth</label>
+    <div class="layui-input-block">
+      <input type="text" value="接口访问，鉴权密钥；密钥不对访问接口将失败" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">fromAddr</label>
+    <div class="layui-input-block">
+      <input type="text" value="本地监听的地址和端口，例如 :8010 或 0.0.0.0:8010" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">toAddr</label>
+    <div class="layui-input-block">
+      <input type="text" value="要将本地监听端口转发到哪个目标地址和端口，例如：192.168.1.100:3306" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">protocol</label>
+    <div class="layui-input-block">
+      <input type="text" value="网络协议TCP或UDP" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <pre class="layui-code">
+/*
+接口返回JSON：
+Code：0表示成功，1表示失败
+Msg: 成功或失败的消息内容
+*/
+{
+  "Code": 0,
+  "Msg": ""
+}
+      </pre> 
+  </div>
+
+</form>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+  <legend>关闭端口转发 接口</legend>
+</fieldset>  
+<form class="layui-form layui-form-pane" action="" method="POST">
+  <div class="layui-form-item">
+    <label class="layui-form-label">接口地址</label>
+    <div class="layui-input-inline">
+      <input type="text" value="/api/v1/CloseForward" disabled="disabled" class="layui-input">
+    </div>
+    
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">请求方式</label>
+    <div class="layui-input-block">
+      <input type="text" value="GET 或 POST" disabled="disabled" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">请求示例</label>
+    <div class="layui-input-block">
+      <input type="text" value="/api/v1/CloseForward?auth={{config "String" "api.auth" "xxxx"}}&fromAddr=:8010&toAddr=192.168.1.100:3306&protocol=TCP" disabled="disabled" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">参数说明：</label>
+    
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">auth</label>
+    <div class="layui-input-block">
+      <input type="text" value="接口访问，鉴权密钥；密钥不对访问接口将失败" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">fromAddr</label>
+    <div class="layui-input-block">
+      <input type="text" value="已经开启的转发，其本地监听的地址和端口" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">toAddr</label>
+    <div class="layui-input-block">
+      <input type="text" value="已经开启的转发，其目标地址和端口，例如：192.168.1.100:3306" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">protocol</label>
+    <div class="layui-input-block">
+      <input type="text" value="网络协议TCP或UDP" disabled="disabled" class="layui-input">
+
+    </div>
+  </div>
+  <div class="layui-form-item">
+      <pre class="layui-code">
+/*
+接口返回JSON：
+Code：0表示成功，1表示失败
+Msg: 成功或失败的消息内容
+*/
+{
+  "Code": 0,
+  "Msg": ""
+}
+      </pre> 
+  </div>
+</form>
+
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        layui.use(['jquery','layer', 'form', 'element'], function () {
+            var $ = layui.jquery, form = layui.form;
+
+
+        });
+
+    });
+
+</script>
+

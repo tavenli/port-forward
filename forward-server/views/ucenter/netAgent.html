@@ -1,0 +1,211 @@
+
+<div style="margin: auto;width: 900px;height: 500px;">
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+  <legend>穿透服务</legend>
+</fieldset>  
+
+<blockquote class="layui-elem-quote">
+  服务端状态：[ {{.magicAddr}} ] <span id="magicStatus"><font color='red'>未运行</font>  <button class='layui-btn layui-btn-small' onclick='OpenMagicService();'>开启服务</button></span>
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+  <legend>内网穿透代理</legend>
+</fieldset>
+
+<blockquote class="layui-elem-quote">
+  NetAgent状态：<span id="netAgentStatus"><font color=red>未检测到Agent连接</font></span>  <button class="layui-btn layui-btn-small" onclick="GetNetAgentStatus();">刷新</button>
+  <button class='layui-btn layui-btn-small' onclick='ClearNetAgentStatus();'>清空连接</button>
+</blockquote>
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+        <legend>透传控制</legend>
+    </fieldset>
+
+    <blockquote id="agentForwardInfo" class="layui-elem-quote">
+        监听地址：{{.agentForward.Addr}}:{{.agentForward.Port}} 透传给：{{.agentForward.TargetAddr}}:{{.agentForward.TargetPort}} 协议：{{.agentForward.Protocol}}
+        透传模式：{{if eq .agentForward.FType 1}}外网透传到内网{{end}} {{if eq .agentForward.FType 2}}内网透传到外网{{end}}
+        <button class='layui-btn layui-btn-small' onclick='StopAgentJob();'>停止透传</button>
+    </blockquote>
+
+   <!--Form开始-->
+
+    <form id="form2" class="layui-form  layui-form-pane" action="/u/StartAgentJob" method="POST">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">监听地址</label>
+            <div class="layui-input-inline">
+                <input type="text" name="lAddr" value="{{.agentForward.Addr}}:{{.agentForward.Port}}" placeholder="如：0.0.0.0:3306" autocomplete="off" class="layui-input">
+
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">协议</label>
+            <div class="layui-input-inline">
+                <select name="protocol">
+                    <option value="TCP">TCP</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">转发到地址</label>
+            <div class="layui-input-inline">
+                <input type="text" name="targetAddr" value="{{.agentForward.TargetAddr}}:{{.agentForward.TargetPort}}" lay-verify="required" placeholder="如：127.0.0.1:3306" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">转发方式</label>
+            <div class="layui-input-inline">
+                <select name="fType">
+                    <option value="1" {{if eq .agentForward.FType 1}}selected="selected"{{end}}>外网透传到内网</option>
+                    <option value="2" {{if eq .agentForward.FType 2}}selected="selected"{{end}}>内网透传到外网</option>
+                </select>
+            </div>
+        </div>
+
+
+    </form>
+    <div class="layui-form-item">
+        <button class='layui-btn layui-btn-small' onclick='StartAgentJob();'>开始透传</button>
+    </div>
+    <!--Form结束-->
+
+
+  <div class="layui-form-item">
+      <pre class="layui-code">
+如果需要实现外网与内网端口的穿透，请将 Port-Forward 端部署在外网服务器上，将 NetAgent 部署在您的内网。
+
+NetAgent： 所在内网机器必须要能上网，能访问到 Port-Forward 所在的服务器。
+Port-Forward： 所在服务器，要确定相应的端口不被防火墙拦截，如果有拦截请修改防火墙配置。
+
+外网透传到内网：在外网上开启一个端口监听服务，并且透传到内网的某个服务端口上。（可以绕开服务端防火墙限制）
+内网透传到外网：在内网开启一个端口监听服务，并且透传到服务器的某个服务端口上。（可以绕开服务端防火墙限制）
+
+透传功能正在重新设计和完善中...
+
+NetAgent 下载 <a href="http://git.oschina.net/tavenli/port-forward/releases" target="_blank">http://git.oschina.net/tavenli/port-forward/releases</a>
+      </pre> 
+  </div>
+
+
+
+
+
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        layui.use(['jquery','layer', 'form', 'element'], function () {
+            var $ = layui.jquery, form = layui.form;
+            form.render('select');
+
+        });
+
+        GetMagicStatus();
+        GetNetAgentStatus();
+
+    });
+
+    function OpenMagicService(){
+        layer.confirm("确定开启穿透服务吗？", {
+            btn: ['确定', '取消'] //按钮
+        }, function(index, layero) {
+            $.post("/u/OpenMagicService", {rnd: Math.random()}, function(json) {
+            if (json.Code == 0) { //成功
+                layer.msg("执行成功.");
+                GetMagicStatus();
+            } else { //失败
+                layer.alert(json.Msg, {icon: 2});
+
+            }
+            }, 'json');
+        });
+    }
+
+    function CloseMagicService(){
+        layer.confirm("确定关闭穿透服务吗？", {
+            btn: ['确定', '取消'] //按钮
+        }, function(index, layero) {
+            $.post("/u/CloseMagicService", {rnd: Math.random()}, function(json) {
+            if (json.Code == 0) { //成功
+                layer.msg("执行成功.");
+                GetMagicStatus();
+            } else { //失败
+                layer.alert(json.Msg, {icon: 2});
+
+            }
+            }, 'json');
+        });
+    }
+
+    function GetMagicStatus(){
+        $.post("/u/GetMagicStatus",{rnd:Math.random()}, function(json) {
+            var html = "";
+            if(json.Code == 0){
+                html += "<font color='green'>"+json.Msg+"</font> <button class='layui-btn layui-btn-small' onclick='CloseMagicService();'>停止服务</button>";                            
+            }else{
+                html += "<font color='red'>"+json.Msg+"</font>  <button class='layui-btn layui-btn-small' onclick='OpenMagicService();'>开启服务</button>";
+            }
+            
+            $("#magicStatus").html(html);
+
+        }, 'json');
+    }
+
+    function GetNetAgentStatus(){
+        $.post("/u/GetNetAgentStatus",{rnd:Math.random()}, function(json) {
+            var html = "";
+            if(json.Code == 0){
+                html += "<font color='green'>"+json.Msg+"</font>";                            
+            }else{
+                html += "<font color='red'>"+json.Msg+"</font>";
+            }
+            
+            $("#netAgentStatus").html(html);
+
+        }, 'json');
+    }
+
+    function ClearNetAgentStatus(){
+        $.post("/u/ClearNetAgentStatus",{rnd:Math.random()}, function(json) {
+            var html = "";
+            if(json.Code == 0){
+                $("#netAgentStatus").html("<font color='red'>未检测到Agent连接</font>");
+            }else{
+                layer.alert(json.Msg, {icon: 2});
+            }            
+            
+
+        }, 'json');
+    }
+
+    function StartAgentJob(){
+        var formData = $("#form2").serialize();
+        $.post("/u/StartAgentJob",formData, function(json) {
+
+            if(json.Code == 0){
+                //$("#agentForwardInfo").html("");
+                loadFrameContent("/u/NetAgent");
+            }else{
+                layer.alert(json.Msg, {icon: 2});
+            }
+
+        }, 'json');
+    }
+
+    function StopAgentJob(){
+        $.post("/u/StopAgentJob",{rnd:Math.random()}, function(json) {
+            if(json.Code == 0){
+                loadFrameContent("/u/NetAgent");
+            }else{
+                layer.alert(json.Msg, {icon: 2});
+            }
+
+        }, 'json');
+    }
+
+</script>
+
