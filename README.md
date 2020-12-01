@@ -2,6 +2,9 @@
 # port-forward
 Go语言开发的端口转发工具  for port data forward
 
+官网地址：
+https://gitee.com/tavenli/port-forward
+
 ```
 开发语言：GO
 控制台框架：beego
@@ -17,7 +20,7 @@ v1.2.9_beta 发布，完善点对点转发的稳定性，支持TCP和UDP协议�
 ```
 
 # 最新编译好的版本下载：
-[http://git.oschina.net/tavenli/port-forward/releases](http://git.oschina.net/tavenli/port-forward/releases)
+[https://gitee.com/tavenli/port-forward/releases](https://gitee.com/tavenli/port-forward/releases)
 
 
 
@@ -44,14 +47,14 @@ v1.2.9_beta 发布，完善点对点转发的稳定性，支持TCP和UDP协议�
 
 
 # 控制台UI
-![登录](http://git.oschina.net/tavenli/port-forward/raw/master/screenshot/Login.png "在这里输入图片标题")
+![登录](https://gitee.com/tavenli/port-forward/raw/master/screenshot/Login.png "在这里输入图片标题")
 
 
-![转发列表](http://git.oschina.net/tavenli/port-forward/raw/master/screenshot/List.png "在这里输入图片标题")
+![转发列表](https://gitee.com/tavenli/port-forward/raw/master/screenshot/List.png "在这里输入图片标题")
 
 
-![端口转发配置](http://git.oschina.net/tavenli/port-forward/raw/master/screenshot/edit.png "在这里输入图片标题")
+![端口转发配置](https://gitee.com/tavenli/port-forward/raw/master/screenshot/edit.png "在这里输入图片标题")
 
 
-![方便与其它平台集成接口](http://git.oschina.net/tavenli/port-forward/raw/master/screenshot/ApiDoc.png "在这里输入图片标题")
+![方便与其它平台集成接口](https://gitee.com/tavenli/port-forward/raw/master/screenshot/ApiDoc.png "在这里输入图片标题")
 
