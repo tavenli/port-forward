@@ -7,7 +7,7 @@ import (
 )
 
 type SysUser struct {
-	Id       int    `orm:"column(id);pk"`
+	Id       int    `orm:"column(id);pk;auto"`
 	UserName string `orm:"column(userName);null"`
 	PassWord string `orm:"column(passWord);null"`
 	// 0:禁用,1:启用

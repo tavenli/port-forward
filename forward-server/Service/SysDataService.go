@@ -293,6 +293,7 @@ func (_self *SysDataService) ToForwardConfig(entity *Models.PortForward) *Models
 	config.DestAddr = entity.TargetAddr
 	config.DestPort = entity.TargetPort
 	config.Status = entity.Status
+	config.Others = entity.Others
 
 	return config
 

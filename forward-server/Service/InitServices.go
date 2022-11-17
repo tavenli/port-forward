@@ -17,6 +17,8 @@ var (
 	//MagicServ   = new(MagicServer)
 	ConsoleServ = new(ConsoleServer)
 	SysDataS    = new(SysDataService)
+
+	ForWardDebug = true
 )
 
 func init() {

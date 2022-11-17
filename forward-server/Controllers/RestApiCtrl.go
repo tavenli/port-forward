@@ -39,7 +39,8 @@ func (c *RestApiCtrl) OpenForward() {
 
 	entity := Service.SysDataS.ChkPortForwardByApi(fromAddr, protocol, toAddr)
 	if entity == nil {
-		_, err := Service.SysDataS.SavePortForwardByApi(fromAddr, protocol, toAddr)
+		var err error
+		entity, err = Service.SysDataS.SavePortForwardByApi(fromAddr, protocol, toAddr)
 		if err != nil {
 			c.Data["json"] = Models.FuncResult{Code: 1, Msg: "保存端口配置失败"}
 			c.ServeJSON()

@@ -2,26 +2,28 @@ package Service
 
 import (
 	"fmt"
+	"forward-core/Constant"
 	"forward-core/Models"
-	"github.com/astaxie/beego/logs"
 	"net"
 	"sync"
+
+	"github.com/astaxie/beego/logs"
 )
 
 type ForWardServer struct {
-	JobMap       map[string]*ForWardJob
-	JobMapLock   sync.Mutex
+	JobMap     map[string]*ForWardJob
+	JobMapLock sync.Mutex
 }
 
 func NewForWardServer() *ForWardServer {
 	return &ForWardServer{
-		JobMap:make(map[string]*ForWardJob,200),
+		JobMap: make(map[string]*ForWardJob, 200),
 	}
 }
 
 func (_self *ForWardServer) FindAllForward() []*Models.ForwardInfo {
 	var forwardList []*Models.ForwardInfo
-	for _,forWardJob := range _self.JobMap {
+	for _, forWardJob := range _self.JobMap {
 
 		forwardInfo := new(Models.ForwardInfo)
 
@@ -38,12 +40,11 @@ func (_self *ForWardServer) FindAllForward() []*Models.ForwardInfo {
 
 				forwardInfo.Clients = append(forwardInfo.Clients, key)
 			}
-		}else{
-			for _,client := range forWardJob.ClientMap {
+		} else {
+			for _, client := range forWardJob.ClientMap {
 				forwardInfo.Clients = append(forwardInfo.Clients, client.SrcConn.RemoteAddr().String())
 			}
 		}
-
 
 		forwardInfo.OnlineCount = len(forwardInfo.Clients)
 
@@ -53,14 +54,10 @@ func (_self *ForWardServer) FindAllForward() []*Models.ForwardInfo {
 	return forwardList
 }
 
-
-
-
-
 func (_self *ForWardServer) GetForwardInfo(config *Models.ForwardConfig) *Models.ForwardInfo {
 
 	forwardInfo := new(Models.ForwardInfo)
-	forWardJob :=_self.GetRegistryJob(config)
+	forWardJob := _self.GetRegistryJob(config)
 	if forWardJob != nil {
 		forwardInfo.Name = forWardJob.Config.Name
 		forwardInfo.Status = forWardJob.Status
@@ -70,7 +67,7 @@ func (_self *ForWardServer) GetForwardInfo(config *Models.ForwardConfig) *Models
 		forwardInfo.DestAddr = forWardJob.Config.DestAddr
 		forwardInfo.DestPort = forWardJob.Config.DestPort
 
-		for _,client := range forWardJob.ClientMap{
+		for _, client := range forWardJob.ClientMap {
 			forwardInfo.Clients = append(forwardInfo.Clients, client.SrcConn.RemoteAddr().String())
 		}
 
@@ -85,11 +82,16 @@ func (_self *ForWardServer) GetForwardJob(config *Models.ForwardConfig) *ForWard
 	return _self.GetRegistryJob(config)
 }
 
-
 func (_self *ForWardServer) OpenForward(config *Models.ForwardConfig, result chan Models.FuncResult) {
+	hasJob := _self.GetForwardJob(config)
+	if hasJob != nil && hasJob.Status == Constant.RunStatus_Running {
+		resultData := &Models.FuncResult{Code: 1, Msg: "该端口转发正在执行中"}
+		result <- *resultData
+		return
+	}
 
 	forWardJob := new(ForWardJob)
-	forWardJob.ClientMap = make(map[string]*ForWardClient,500)
+	forWardJob.ClientMap = make(map[string]*ForWardClient, 500)
 	forWardJob.Config = config
 	forWardJob.UdpForwardJob = NewUdpForward()
 
@@ -124,7 +126,9 @@ func (_self *ForWardServer) UnRegistryJob(config *Models.ForwardConfig) {
 
 	key := _self.GetJobKey(config)
 	delete(_self.JobMap, key)
-	logs.Debug("UnRegistryClient key: ", key)
+	if ForWardDebug == true {
+		logs.Debug("UnRegistryClient key: ", key)
+	}
 
 }
 
@@ -157,6 +161,6 @@ func (_self *ForWardServer) CloseAllForward() {
 	}
 
 	//_self.JobMap = nil
-	_self.JobMap = make(map[string]*ForWardJob,200)
+	_self.JobMap = make(map[string]*ForWardJob, 200)
 
 }

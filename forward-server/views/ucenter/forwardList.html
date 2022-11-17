@@ -1,7 +1,8 @@
-<div class="layui-tab layui-tab-card">
+<div class="layui-tab layui-tab-card" lay-filter="tabForwardList">
   
   <ul class="layui-tab-title">
     <li class="layui-this">端口转发列表</li>
+    <li>快捷功能</li>
     <li>帮助说明</li>
   </ul>
   <div class="layui-tab-content" style="height: auto;">
@@ -38,10 +39,11 @@
         </div>
       </div>
 
-      <button class="layui-btn layui-btn-small" onclick="addForward();"><i class="layui-icon"></i> 添加转发</button>
+      <button class="layui-btn layui-btn-small" onclick="addForward();"><i class="layui-icon"></i> 添加转发</button>      
       <button class="layui-btn layui-btn-small" onclick="delForward();"><i class="layui-icon"></i> 批量删除</button>
-      <button class="layui-btn layui-btn-small layui-btn-danger" onclick="OpenAllForward();">一键开启</button>
-      <button class="layui-btn layui-btn-small layui-btn-danger" onclick="CloseAllForward();">一键关闭</button>
+      <button class="layui-btn layui-btn-small layui-btn-normal" onclick="AddBatchForward();"><i class="layui-icon"></i> 快速批量添加</button>
+      <button class="layui-btn layui-btn-small layui-btn-normal" onclick="ImportForward();"><i class="layui-icon"></i> 批量导入</button>
+      
       <div class="layui-form">
         <table class="layui-table">
           <colgroup>
@@ -79,6 +81,44 @@
         </table>
       </div>
       <div id="pagination"></div>
+    </div>
+    <div class="layui-tab-item layui-form">
+      <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item text-right">
+                <div class="layui-inline pull-left">
+                  <button class="layui-btn layui-btn-small layui-btn-danger" onclick="OpenAllForward();">一键开启</button>
+                  <button class="layui-btn layui-btn-small layui-btn-danger" onclick="CloseAllForward();">一键关闭</button>
+                </div>
+                
+            </div>
+        </div>
+        <pre class="layui-code text-right">
+          一键开启说明：
+          1、不需要批量勾选规则，只要规则设置了支持“一键开启”都会被一键开启转发。
+          2、通过在配置文件中添加  onstart.forward = "true" ，可让程序每次运行后就开始转发该规则。
+          3、也可以通过在列表页面通过点击“一键开启” “一键关闭”来开启/关闭所有转发。
+        </pre>
+        <div class="layui-card-body">
+          <div class="layui-form-item text-right">
+              <div class="layui-inline pull-left">
+                <label class="layui-form-label">详细日志</label>
+                <div class="layui-input-block">
+                  <input type="checkbox" name="debugStatus" lay-skin="switch" {{if eq .ForWardDebug true}} checked {{end}} lay-filter="ForWardDebug" lay-text="ON|OFF">
+                </div>
+              </div>
+              
+          </div>
+          
+      </div>
+      <pre class="layui-code text-right">
+        详细日志开关说明：
+        1、主要对网络流量突然增大时，连接多、日志多，这个时候不想打印太多日志，可以临时关闭。
+        2、详细日志开启时，日志文件会记录较多的后台处理信息，可以帮助分析问题。
+        3、开源版本的详细日志，默认开启，只能临时关闭。
+      </pre>
+
+    </div>
     </div>
     <div class="layui-tab-item">
       <pre class="layui-code">
@@ -122,6 +162,9 @@ $(document).ready(function() {
       form = layui.form,
       laytpl = layui.laytpl,
       laypage = layui.laypage;
+
+    var element = layui.element;
+
     //全选
     form.on('checkbox(allChoose)', function(data) {
       var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
@@ -130,12 +173,41 @@ $(document).ready(function() {
       });
       form.render('checkbox');
     });
+
     layui.laytpl.config({
       open: "{Start{",
       close: "}End}"
     });
 
+    element.on('tab(tabForwardList)', function(data){
+      console.log(data);
+      form.render('checkbox');
+      form.render();
+    });
+
+    form.on('checkbox()', function(data){
+      console.log(data.elem); //得到checkbox原始DOM对象
+      console.log(data.elem.checked); //是否被选中，true或者false
+      console.log(data.value); //复选框value值，也可以通过data.elem.value得到
+      console.log(data.othis); //得到美化后的DOM对象
+    }); 
+
+    form.on('switch(ForWardDebug)', function(data){
+      $.get("/u/ChangeForwardDebug", {
+        rnd: Math.random(),
+        status: data.elem.checked?1:0
+      }, function(json) {
+        
+      }, 'json');
+
+    });
+
+    //
+    form.render('checkbox');
+    form.render();
+    //
     query(1);
+
   });
 });
 
@@ -163,6 +235,7 @@ function query(pIndex) {
         pages: totalPages, //通过后台拿到的总页数
         count: totalRows,
         limit: 10,
+        limits: [10, 20, 30, 50, 100],
         groups: 5, //连续分页数
         skin: "#51b921", //控制分页皮肤。目前支持：molv、yahei、flow 除此之外，还支持16进制颜色值，如:skin:'#c00'
         curr: pIndex || 1, //当前页
@@ -327,6 +400,54 @@ function delForward() {
         query(1);
       }
     }, 'json');
+  });
+}
+
+function AddBatchForward() {
+  $.get('/u/AddBatchForward', {
+    rnd: Math.random()
+  }, function(html) {
+    layer.open({
+      type: 1, //page层
+      area: ['1200px', '700px'],
+      title: '批量添加规则',
+      shade: 0.6, //遮罩透明度
+      moveType: 1, //拖拽风格，0是默认，1是传统拖动
+      shift: -1, //0-6的动画形式，-1不开启
+      maxmin: false,
+      content: html,
+      btn: ['保存', '取消'],
+      yes: function(index, layero) {
+        submitForm(index);
+      },
+      cancel: function(index) {
+        layer.close(index);
+      }
+    });
+  });
+}
+
+function ImportForward() {
+  $.get('/u/ImportForward', {
+    rnd: Math.random()
+  }, function(html) {
+    layer.open({
+      type: 1, //page层
+      area: ['750px', '500px'],
+      title: '批量导入规则',
+      shade: 0.6, //遮罩透明度
+      moveType: 1, //拖拽风格，0是默认，1是传统拖动
+      shift: -1, //0-6的动画形式，-1不开启
+      maxmin: false,
+      content: html,
+      btn: ['保存', '取消'],
+      yes: function(index, layero) {
+        submitForm(index);
+      },
+      cancel: function(index) {
+        layer.close(index);
+      }
+    });
   });
 }
 

@@ -6,6 +6,7 @@ import (
 	"forward-core/Models"
 	"forward-core/NetUtils"
 	"forward-core/Utils"
+	"io"
 	"net"
 	"sync"
 	"time"
@@ -27,7 +28,7 @@ func (_self *ForWardJob) StartJob(result chan Models.FuncResult) {
 	sourceAddr := fmt.Sprint(_self.Config.SrcAddr, ":", _self.Config.SrcPort)
 	destAddr := fmt.Sprint(_self.Config.DestAddr, ":", _self.Config.DestPort)
 
-	resultData := &Models.FuncResult{Code: 0, Msg: ""}
+	resultData := &Models.FuncResult{Code: 0, Msg: "success"}
 	var err error
 	if _self.IsUdpJob() {
 		//_self.PortListener, err = NetUtils.NewKCP(sourceAddr, Common.DefaultKcpSetting())
@@ -79,7 +80,9 @@ func (_self *ForWardJob) doTcpForward(destAddr string) {
 			break
 		}
 
-		logs.Info("新用户 ", realClientConn.RemoteAddr().String(), " 数据转发规则：", fmt.Sprint(_self.Config.SrcAddr, ":", _self.Config.SrcPort), "->", destAddr)
+		if ForWardDebug == true {
+			logs.Info("新用户 ", realClientConn.RemoteAddr().String(), " 数据转发规则：", fmt.Sprint(_self.Config.SrcAddr, ":", _self.Config.SrcPort), "->", destAddr)
+		}
 
 		var destConn net.Conn
 		if _self.Config.Protocol == "UDP" {
@@ -90,14 +93,37 @@ func (_self *ForWardJob) doTcpForward(destAddr string) {
 		}
 
 		if err != nil {
-			logs.Error("转发出现异常 Forward to Dest Addr err:", err.Error())
+			if ForWardDebug == true {
+				logs.Warn("转发出现异常 Forward to Dest Addr err:", err.Error())
+			}
+
 			//break
 			continue
 
 		}
 
-		forwardClient := &ForWardClient{realClientConn, destConn, _self.ClosedCallBack}
-		go forwardClient.StartForward()
+		forwardClient := &ForWardClient{realClientConn, destConn, nil, _self.ClosedCallBack}
+
+		if Utils.IsNotEmpty(_self.Config.Others) {
+			var dispatchConns []io.Writer
+			//分发方式
+			dispatchTargets := Utils.Split(_self.Config.Others, ";")
+
+			for _, dispatchTarget := range dispatchTargets {
+				logs.Debug("分发到：", dispatchTarget)
+				dispatchTargetConn, err := net.DialTimeout("tcp", dispatchTarget, 30*time.Second)
+				if err == nil {
+					dispatchConns = append(dispatchConns, dispatchTargetConn)
+				}
+
+			}
+
+			forwardClient.DispatchConns = dispatchConns
+
+			go forwardClient.DispatchData(dispatchConns)
+		} else {
+			go forwardClient.StartForward()
+		}
 
 		_self.RegistryClient(_self.GetClientId(realClientConn), forwardClient)
 		//_self.RegistryClient(fmt.Sprint(sourceAddr, "_", "TCP", "_", id), forwardClient)
@@ -127,7 +153,9 @@ func (_self *ForWardJob) UnRegistryClient(srcAddr string) {
 	defer _self.ClientMapLock.Unlock()
 
 	delete(_self.ClientMap, srcAddr)
-	logs.Debug("UnRegistryClient srcAddr: ", srcAddr)
+	if ForWardDebug == true {
+		logs.Debug("UnRegistryClient srcAddr: ", srcAddr)
+	}
 
 }
 
@@ -157,7 +185,9 @@ func (_self *ForWardJob) stopTcpJob() {
 	_self.PortListener.Close()
 
 	for srcAddr, client := range _self.ClientMap {
-		logs.Debug("停止真实用户连接：", srcAddr)
+		if ForWardDebug == true {
+			logs.Debug("停止真实用户连接：", srcAddr)
+		}
 		client.StopForward()
 	}
 

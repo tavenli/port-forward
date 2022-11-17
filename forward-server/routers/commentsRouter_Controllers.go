@@ -54,6 +54,15 @@ func init() {
 
 	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
 		beego.ControllerComments{
+			Method:           "OpenForward",
+			Router:           `/u/OpenForward`,
+			AllowHTTPMethods: []string{"get", "post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
+		beego.ControllerComments{
 			Method:           "CloseForward",
 			Router:           `/u/CloseForward`,
 			AllowHTTPMethods: []string{"get", "post"},
@@ -74,6 +83,15 @@ func init() {
 		beego.ControllerComments{
 			Method:           "CloseAllForward",
 			Router:           `/u/CloseAllForward`,
+			AllowHTTPMethods: []string{"get", "post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
+		beego.ControllerComments{
+			Method:           "ChangeForwardDebug",
+			Router:           `/u/ChangeForwardDebug`,
 			AllowHTTPMethods: []string{"get", "post"},
 			MethodParams:     param.Make(),
 			Filters:          nil,
@@ -153,15 +171,6 @@ func init() {
 
 	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
 		beego.ControllerComments{
-			Method:           "OpenForward",
-			Router:           `/u/OpenForward`,
-			AllowHTTPMethods: []string{"get", "post"},
-			MethodParams:     param.Make(),
-			Filters:          nil,
-			Params:           nil})
-
-	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
-		beego.ControllerComments{
 			Method:           "OpenMagicService",
 			Router:           `/u/OpenMagicService`,
 			AllowHTTPMethods: []string{"post"},
@@ -191,6 +200,42 @@ func init() {
 		beego.ControllerComments{
 			Method:           "StopAgentJob",
 			Router:           `/u/StopAgentJob`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
+		beego.ControllerComments{
+			Method:           "AddBatchForward",
+			Router:           `/u/AddBatchForward`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
+		beego.ControllerComments{
+			Method:           "SaveBatchForward",
+			Router:           `/u/SaveBatchForward`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
+		beego.ControllerComments{
+			Method:           "ImportForward",
+			Router:           `/u/ImportForward`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
+	beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"] = append(beego.GlobalControllerRouter["forward-server/Controllers:ForwardCtrl"],
+		beego.ControllerComments{
+			Method:           "SaveImportForward",
+			Router:           `/u/SaveImportForward`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams:     param.Make(),
 			Filters:          nil,

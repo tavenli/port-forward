@@ -1,2 +1,11 @@
 logs
 *.log
+
+.idea
+.temp
+
+*.log
+*.iml
+*.sum
+
+/*.sum

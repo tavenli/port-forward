@@ -1,0 +1,136 @@
+
+<form class="layui-form model-form" id="form1" action="/u/SaveBatchForward" method="POST">
+  <div class="layui-card">
+
+      <div class="layui-card-body">
+          <div class="layui-form-item text-right">
+              <div class="layui-inline pull-left">
+                  <button type="button" class="layui-btn icon-btn" onclick="addTableRow();"><i class="layui-icon">&#xe654;</i>添加一行</button>
+                  
+              </div>
+
+          </div>
+      </div>
+      <div class="layui-card-body" id="batchForwardTable">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+                <div class="layui-input-inline">
+                    <input name="name[]" placeholder="取个名称，用以区分" lay-verify="required" autocomplete="off" class="layui-input">
+                    
+                </div>
+                <div class="layui-input-inline">
+                    <input name="port[]" placeholder="监听端口" lay-verify="requirequired|numberred" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <select name="protocol[]" lay-verType="tips">
+                        <option value="TCP">TCP</option>
+                        <option value="UDP">UDP</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                  <input name="targetAddr[]" placeholder="目标地址" lay-verify="requirequired" autocomplete="off" class="layui-input">
+              </div>
+              <div class="layui-input-inline">
+                <input name="targetPort[]" placeholder="目标端口号" lay-verify="requirequired|numberred" autocomplete="off" class="layui-input">
+              </div>
+                <div class="layui-input-inline" style="width: 50px;">                    
+                    <button type="button" class="layui-btn layui-btn-danger icon-btn layui-btn-xs" onclick="delRow(this);">
+                        <i class="layui-icon">&#xe640;</i>删除
+                    </button>
+                </div>
+                
+            </div>
+          </div>
+
+      </div>
+
+  </div>
+</form>
+
+
+<script type="text/html" id="forwardRow">
+  <div class="layui-form-item">
+    <div class="layui-inline">
+        <div class="layui-input-inline">
+            <input name="name[]" placeholder="取个名称，用以区分" lay-verify="required" autocomplete="off" class="layui-input">
+            
+        </div>
+        <div class="layui-input-inline">
+            <input name="port[]" placeholder="监听端口" lay-verify="required|numberred" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-input-inline">
+            <select name="protocol[]" lay-verType="tips">
+                <option value="TCP">TCP</option>
+                <option value="UDP">UDP</option>
+            </select>
+        </div>
+        <div class="layui-input-inline">
+          <input name="targetAddr[]" placeholder="目标地址" lay-verify="required" autocomplete="off" class="layui-input">
+      </div>
+      <div class="layui-input-inline">
+        <input name="targetPort[]" placeholder="目标端口号" lay-verify="required|numberred" autocomplete="off" class="layui-input">
+      </div>
+        <div class="layui-input-inline" style="width: 50px;">                    
+            <button type="button" class="layui-btn layui-btn-danger icon-btn layui-btn-xs" onclick="delRow(this);">
+                <i class="layui-icon">&#xe640;</i>删除
+            </button>
+        </div>
+        
+    </div>
+  </div>
+</script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+
+    layui.use(["form", "element"], function () {
+      var form = layui.form;
+
+      form.render();
+    });
+
+
+  });
+
+
+  function addTableRow(){
+        var data = {};
+        var script_tpl = document.getElementById('forwardRow').innerHTML;
+        layui.laytpl(script_tpl).render(data, function(html){
+            layui.jquery(html).appendTo("#batchForwardTable");				
+            
+            layui.form.render();
+        });
+    }
+
+  function delRow(obj){
+      layui.jquery(obj).parent().parent().parent().remove();
+  }
+
+
+  function submitForm(index) {
+    // if ($("#form1").submit() == false) {
+    //   return;
+    // }
+    
+    //var postData = $("#form1").serializeArray();
+    var postData = layui.form.getValue(null, $("#form1"));
+    //console.log(postData);
+    postData.rows = $("#batchForwardTable").children().length;
+    $.post($("#form1").attr("action"), postData, function (json) {
+      //var data = $.parseJSON(json);
+      if (json.Code == 0) {
+        //成功
+        //layer.alert("保存成功");
+        //layer.msg("保存成功.");
+        refreshGrid();
+        layer.close(index);
+
+      } else {
+        //
+        layer.alert("失败了：" + json.Msg, { icon: 2 });
+      }
+    }, "json");
+  }
+
+</script>

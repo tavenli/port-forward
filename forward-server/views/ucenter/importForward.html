@@ -1,0 +1,66 @@
+
+<form class="layui-form model-form" id="form1" action="/u/SaveImportForward" method="POST">
+  <div class="layui-form-item">
+      <label class="layui-form-label layui-form-required">分割符号:</label>
+      <div class="layui-input-block">
+          <input name="splitChar" placeholder="分割符号，如 , : | - 等" class="layui-input" style="font-size: x-large;" lay-verType="tips" lay-verify="required" value="," maxlength="1" required/>          
+      </div>
+  </div>    
+  <div class="layui-form-item">
+      <label class="layui-form-label layui-form-required">导入数据:</label>
+      <div class="layui-input-block">
+        <textarea name="inputDatas" class="input-textarea" rows="15" style="height:200px;width:90%;margin-top:5px;padding:5px;" lay-verify="required" required></textarea>
+      </div>
+  </div>
+  <div class="layui-form-item">
+    <pre class="layui-code text-right">
+      假设分隔符为 , 号，导入数据格式为：
+      名称,本地监听地址,本地监听端口,协议类型,目标地址,目标端口
+      
+      举例：
+      测试1,127.0.0.1,8000,TCP,127.0.0.1,3306
+      测试2,0.0.0.0,8001,TCP,127.0.0.1,27017
+      ,,8002,UDP,192.168.1.100,1443
+    </pre>
+</div>
+
+</form>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+
+    layui.use(["form", "element"], function () {
+      var form = layui.form;
+
+      form.render();
+    });
+
+
+  });
+
+
+  function submitForm(index) {
+    // if ($("#form1").submit() == false) {
+    //   return;
+    // }
+    
+    //var postData = $("#form1").serializeArray();
+    var postData = layui.form.getValue(null, $("#form1"));
+    //console.log(postData);
+    $.post($("#form1").attr("action"), postData, function (json) {
+      //var data = $.parseJSON(json);
+      if (json.Code == 0) {
+        //成功
+        //layer.alert("保存成功");
+        //layer.msg("保存成功.");
+        refreshGrid();
+        layer.close(index);
+
+      } else {
+        //
+        layer.alert("失败了：" + json.Msg, { icon: 2 });
+      }
+    }, "json");
+  }
+
+</script>

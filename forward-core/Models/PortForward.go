@@ -7,7 +7,7 @@ import (
 )
 
 type PortForward struct {
-	Id   int    `orm:"column(id);pk"`
+	Id   int    `orm:"column(id);pk;auto"`
 	Name string `orm:"column(name);size(256);null"`
 	// 0:禁用,1:启用
 	Status int    `orm:"column(status);null"`
